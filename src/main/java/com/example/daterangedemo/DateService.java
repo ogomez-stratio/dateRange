@@ -13,10 +13,10 @@ public class DateService {
 
     DateEntity entity = DateEntity.builder()
         .dateInterval(TimeStampRange.builder()
-            .dateFrom(0L)
-            .dateTo(1L)
+            .dateFrom(3133454567L)
+            .dateTo(3133454569L)
             .build())
-        .id("id")
+        .id(dto.getId())
         .build();
     repository.save(entity);
   }

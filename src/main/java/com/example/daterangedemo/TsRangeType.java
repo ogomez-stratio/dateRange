@@ -7,6 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
@@ -18,11 +24,13 @@ public class TsRangeType implements UserType{
 
   @Override
   public int[] sqlTypes() {
+
     return SQL_TYPES;
   }
 
   @Override
   public Class returnedClass() {
+
     return TimeStampRange.class;
   }
 
@@ -39,13 +47,21 @@ public class TsRangeType implements UserType{
   @Override
   public Object nullSafeGet(ResultSet resultSet, String[] strings,
       SessionImplementor sessionImplementor, Object o) throws HibernateException, SQLException {
-    Date from = resultSet.getDate(strings[0]);
-    Date to = resultSet.getDate(strings[1]);
-    if (resultSet.wasNull() || from == null) {
+    String range = resultSet.getString(strings[0]);
+
+    if (resultSet.wasNull() || range == null) {
       return null;
     }
-    PGTimestamp pgFrom = new PGTimestamp(from.getTime());
-    PGTimestamp pgTo = new PGTimestamp(to.getTime());
+
+    Matcher matches = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3})")
+            .matcher(range);
+
+    List<String> allMatches = new ArrayList<>();
+    while (matches.find()) {
+      allMatches.add(matches.group());
+    }
+    PGTimestamp pgFrom = new PGTimestamp(allMatches.indexOf(0));
+    PGTimestamp pgTo = new PGTimestamp(allMatches.indexOf(1));
     TimeStampRange ts = TimeStampRange.builder()
         .dateFrom(pgFrom.getTime())
         .dateTo(pgTo.getTime())
@@ -66,12 +82,14 @@ public class TsRangeType implements UserType{
   }
 
   private static String getInterval(TimeStampRange value){
-    return "[" + value.dateFrom + "," + value.dateTo + ")";
+    PGTimestamp pgFrom = new PGTimestamp(value.dateFrom);
+    PGTimestamp pgTo = new PGTimestamp(value.dateTo);
+    return "[" + pgFrom + "," + pgTo + ")";
   }
 
   @Override
   public Object deepCopy(Object o) throws HibernateException {
-    return null;
+    return o;
   }
 
   @Override

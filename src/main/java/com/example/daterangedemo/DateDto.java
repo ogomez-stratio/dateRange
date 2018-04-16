@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class DateDto {
 
-  private String range;
+//  private String range;
   private String id;
 }
