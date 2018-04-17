@@ -2,11 +2,7 @@ package com.example.daterangedemo;
 
 
 import java.io.Serializable;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -63,8 +59,8 @@ public class TsRangeType implements UserType{
     PGTimestamp pgFrom = new PGTimestamp(allMatches.indexOf(0));
     PGTimestamp pgTo = new PGTimestamp(allMatches.indexOf(1));
     TimeStampRange ts = TimeStampRange.builder()
-        .dateFrom(pgFrom.getTime())
-        .dateTo(pgTo.getTime())
+        .dateFrom(pgFrom.toLocalDateTime())
+        .dateTo(pgTo.toLocalDateTime())
         .build();
     return ts;
   }
@@ -82,8 +78,9 @@ public class TsRangeType implements UserType{
   }
 
   private static String getInterval(TimeStampRange value){
-    PGTimestamp pgFrom = new PGTimestamp(value.dateFrom);
-    PGTimestamp pgTo = new PGTimestamp(value.dateTo);
+
+    PGTimestamp pgFrom = new PGTimestamp(PGTimestamp.valueOf(value.dateFrom).getTime());
+    PGTimestamp pgTo = new PGTimestamp(PGTimestamp.valueOf(value.dateTo).getTime());
     return "[" + pgFrom + "," + pgTo + ")";
   }
 

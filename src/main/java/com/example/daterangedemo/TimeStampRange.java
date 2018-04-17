@@ -1,6 +1,8 @@
 package com.example.daterangedemo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TimeStampRange implements Serializable {
-    Long dateFrom;
-    Long dateTo;
+    LocalDateTime dateFrom;
+    LocalDateTime dateTo;
 }
